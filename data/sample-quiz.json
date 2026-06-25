@@ -1,0 +1,25 @@
+{
+  "quiz": {
+    "title": "Launch Night Trivia",
+    "description": "Sample import file for PulseQuiz.",
+    "status": "published"
+  },
+  "questions": [
+    {
+      "prompt": "Which service is used for realtime events?",
+      "type": "multiple_choice",
+      "options": ["Pusher", "Polling", "Cron", "RSS"],
+      "correct_answer": "Pusher",
+      "timer_seconds": 20,
+      "points": 1000
+    },
+    {
+      "prompt": "Players can change answers after submitting.",
+      "type": "true_false",
+      "options": ["True", "False"],
+      "correct_answer": "False",
+      "timer_seconds": 15,
+      "points": 800
+    }
+  ]
+}
