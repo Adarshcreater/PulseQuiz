@@ -5,4 +5,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
   const { code } = await params;
   const snapshot = await getSnapshot(code);
   return snapshot ? json(snapshot) : error("Session not found", 404);
+  catch (err){
+    console.error("JOIN ERROR:", err);
+    if (err instanceof Error){
+      console.error(err.stack);
+      return error(err.message);
+    }
+    return error(String(err));
 }
