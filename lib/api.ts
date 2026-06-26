@@ -25,10 +25,10 @@ export async function publishSnapshot(
   const snapshot = await getSnapshot(code);
 
   if (snapshot) {
-    await publish(code, event, { 
+    await publish(code, event, {
       updated: true,
       event,
-      time: Date.now(),
+      timestamp: Date.now(),
     });
   }
 
