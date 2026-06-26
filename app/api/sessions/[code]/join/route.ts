@@ -14,7 +14,15 @@ export async function POST(
     const snapshot = await publishSnapshot(code, events.playerJoined);
 
     return json({ team, snapshot });
-  } catch (err) {
-    throw err;
-  }
+  } 
+catch (err) {
+  console.error("JOIN ERROR:", err);
+
+  return json(
+    {
+      error:
+        err instanceof Error ? err.message : String(err),
+    },
+    { status: 500 }
+  );
 }
