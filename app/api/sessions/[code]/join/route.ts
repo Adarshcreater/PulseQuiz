@@ -6,23 +6,49 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ code: string }> }
 ) {
-  const { code } = await params;
-  const { name, members } = await request.json();
-
   try {
-    const team = await joinSession(code, name, Number(members || 1));
-    const snapshot = await publishSnapshot(code, events.playerJoined);
+    const { code } = await params;
 
-    return json({ team, snapshot });
-  } 
-catch (err) {
-  console.error("JOIN ERROR:", err);
+    const { name, members } = await request.json();
 
-  return json(
-    {
-      error:
-        err instanceof Error ? err.message : String(err),
-    },
-    { status: 500 }
-  );
+    console.log("JOIN REQUEST");
+    console.log("Code:", code);
+    console.log("Name:", name);
+    console.log("Members:", members);
+
+    const team = await joinSession(
+      code,
+      name,
+      Number(members || 1)
+    );
+
+    console.log("Team Created:", team.id);
+
+    const snapshot = await publishSnapshot(
+      code,
+      events.playerJoined
+    );
+
+    console.log("Snapshot Published");
+
+    return json({
+      team,
+      snapshot,
+    });
+  } catch (err) {
+    console.error("========== JOIN ERROR ==========");
+    console.error(err);
+
+    return Response.json(
+      {
+        error:
+          err instanceof Error
+            ? err.message
+            : String(err),
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }
