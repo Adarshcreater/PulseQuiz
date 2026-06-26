@@ -18,7 +18,10 @@ export async function requireAdmin() {
   return null;
 }
 
-export async function publishSnapshot(code: string, event: string = events.snapshot) {
+export async function publishSnapshot(
+  code: string, 
+  event: string = events.snapshot
+) {
   const snapshot = await getSnapshot(code);
   if (snapshot) {
     await publish(code, event, {
@@ -26,5 +29,6 @@ export async function publishSnapshot(code: string, event: string = events.snaps
       event: event,
       timestamp: Date.now(),
   });
+  }
   return snapshot;
 }
