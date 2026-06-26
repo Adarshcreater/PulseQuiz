@@ -31,5 +31,25 @@ export function createPusherClient() {
 export async function publish(code: string, event: string, payload: unknown) {
   const pusher = getPusherServer();
   if (!pusher) return;
-  await pusher.trigger(`quiz-${code.toUpperCase()}`, event, payload);
+  try {
+  console.log("Publishing event:", event);
+  console.log("Channel:", `quiz-${code.toUpperCase()}`);
+  console.log("Payload:", JSON.stringify(payload).length);
+
+  await pusher.trigger(
+    `quiz-${code.toUpperCase()}`,
+    event,
+    payload
+  );
+
+  console.log("Pusher success");
+
+} catch (err) {
+  console.error("PUSHER ERROR");
+  console.error(err);
+
+  throw err;
+}
+
+
 }
