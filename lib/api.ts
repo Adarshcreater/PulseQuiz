@@ -22,9 +22,9 @@ export async function publishSnapshot(code: string, event: string = events.snaps
   const snapshot = await getSnapshot(code);
   if (snapshot) {
     await publish(code, event, {
-      code,
-      event,
-      timestamp: Date.now();
+      code: code,
+      event: event,
+      timestamp: Date.now(),
   });
   return snapshot;
 }
