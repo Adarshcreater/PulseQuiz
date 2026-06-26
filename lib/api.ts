@@ -24,11 +24,8 @@ export async function publishSnapshot(
 ) {
   const snapshot = await getSnapshot(code);
   if (snapshot) {
-    await publish(code, event, {
-      code: code,
-      event: event,
-      timestamp: Date.now(),
-  });
-  }
-  return snapshot;
+    await publish(code, event,timestamp),
+      }
+      return snapshot;
 }
+
