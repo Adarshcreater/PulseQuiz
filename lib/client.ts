@@ -29,8 +29,24 @@ export function useLiveSession(code: string, initial?: SessionSnapshot | null) {
       };
     }
     const channel = client.subscribe(`quiz-${code.toUpperCase()}`);
-    const update = (data: SessionSnapshot) => setSnapshot(data);
-    Object.values(events).forEach((event) => channel.bind(event, update));
+    const update = async () => {
+  try {
+    const response = await fetch(`/api/sessions/${code}`, {
+      cache: "no-store",
+    });
+
+    if (response.ok) {
+      setSnapshot(await response.json());
+      setOffline(false);
+    }
+  } catch {
+    setOffline(true);
+  }
+};
+
+Object.values(events).forEach((event) =>
+  channel.bind(event, update)
+);
     return () => {
       active = false;
       Object.values(events).forEach((event) => channel.unbind(event, update));
