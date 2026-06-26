@@ -19,13 +19,14 @@ export async function requireAdmin() {
 }
 
 export async function publishSnapshot(
-  code: string, 
+  code: string,
   event: string = events.snapshot
 ) {
   const snapshot = await getSnapshot(code);
-  if (snapshot) {
-    await publish(code, event,timestamp),
-      }
-      return snapshot;
-}
 
+  if (snapshot) {
+    await publish(code, event, snapshot);
+  }
+
+  return snapshot;
+}
