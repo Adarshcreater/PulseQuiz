@@ -147,21 +147,27 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
    </div>
  )}
 </div>
-        {answered && result && (
-            <motion.div ...>
-              {result.correct ? (
-              <>
-              Correct
-              </>
-              ) : (
-              <>
-                Incorrect
-              </>
-              )}
-              <Mini label="Points" value={result.points} />
-              <Mini label="Total" value={result.total} />
-              <Mini label="Rank" value={`#${result.rank}`} />
-            </motion.div>
+ {answered && result && (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="mt-5 glass rounded-lg p-5 text-center"
+  >
+    <h2
+      className={`text-2xl font-bold ${
+        result.correct ? "text-green-400" : "text-red-400"
+      }`}
+    >
+      {result.correct ? "✅ Correct!" : "❌ Incorrect"}
+    </h2>
+
+    <div className="mt-4 grid grid-cols-3 gap-3">
+      <Mini label="Points" value={result.points} />
+      <Mini label="Total" value={result.total} />
+      <Mini label="Rank" value={`#${result.rank}`} />
+    </div>
+  </motion.div>
+)}
       )}
       </div>
     </PhoneFrame>
@@ -173,5 +179,20 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
 
 function Waiting({ title, subtitle, offline }: { title: string; subtitle: string; offline: boolean }) {
   return <div className="glass w-full rounded-lg p-6 text-center"><h1 className="text-3xl font-black">{title}</h1><p className="mt-3 text-white/65">{subtitle}</p>{offline ? <p className="mt-4 text-yellow-200">Reconnecting...</p> : null}</div>;
+}
+
+function Mini({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-md bg-white/10 p-3">
+      <div className="text-xs text-white/60">{label}</div>
+      <div className="text-xl font-bold">{value}</div>
+    </div>
+  );
 }
 
