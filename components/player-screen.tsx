@@ -39,7 +39,7 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
   useEffect(() => {
     setTextAnswer("");
     setSubmittedQuestion("");
-  }, [snapshot?.currentQuestion?.id});
+  }, [snapshot?.currentQuestion?.id]);
 
   const answered = submittedQuestion === snapshot?.currentQuestion?.id;
   const rank = useMemo(() => team && snapshot ? snapshot.leaderboard.findIndex((item) => item.id === team.id) + 1 : 0, [snapshot, team]);
