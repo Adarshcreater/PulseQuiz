@@ -164,7 +164,12 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
     teams,
     answers,
     leaderboard: [...teams].sort((a, b) => b.score - a.score),
-    currentQuestion,
+    currentQuestion: currentQuestion
+    ?{
+      ...currentQuestion,
+      correct_answer:"",
+    }
+      : undefined,
     stats: { answersReceived: currentAnswers.length, averageResponseMs, correctPercent }
   };
 }
@@ -227,7 +232,8 @@ export async function submitAnswer(code: string, teamId: string, answer: string)
   const question = snapshot.currentQuestion;
   const startedAt = snapshot.session.question_started_at ? new Date(snapshot.session.question_started_at).getTime() : Date.now();
   const responseMs = Math.max(0, Date.now() - startedAt);
-  const isCorrect = answer.trim().toLowerCase() === question.correct_answer.trim().toLowerCase();
+  const normalize = (text: string) => text.trim().replace(/\s+/g," ").toLowerCase();
+  const isCorrect = normalize(answer) === normalize(question.correct_answer);
   const timeFactor = Math.max(0.25, 1 - responseMs / (question.timer_seconds * 1000));
   const points = isCorrect ? Math.round(question.points * timeFactor) : 0;
   const [saved] = (await sql`
