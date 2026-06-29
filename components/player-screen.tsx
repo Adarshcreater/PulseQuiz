@@ -138,7 +138,7 @@ setResult({
              🎉 Quiz Finished
     </h1>
     <div className="mt-6">
-<Mini
+        <Mini
            label="Final Score"
            value={myTeam?.score ?? 0}
          />
@@ -218,9 +218,6 @@ setResult({
     <div className="mt-4 grid grid-cols-3 gap-3">
       <Mini label="Points" value={result.points} />
       <Mini label="Total" value={result.total} />
-      {snapshot.session.status === "finished" && (
-         <Mini label="Final Rank" value={`#${result.rank}`} />
-         )}
     </div>
   </motion.div>
 
