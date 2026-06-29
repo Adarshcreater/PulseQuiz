@@ -163,7 +163,8 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
       type: q.type,
       options: q.options,
       correct: q.correct_answer,
-    })))
+    }))
+    );
   return {
     session,
     quiz,
