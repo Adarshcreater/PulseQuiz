@@ -164,7 +164,12 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
     teams,
     answers,
     leaderboard: [...teams].sort((a, b) => b.score - a.score),
-    currentQuestion,
+    currentQuestion: currentQuestion
+      ?{
+        ...currentQuestion,
+        correct_answer: "",
+      }
+      :undefined,
     stats: { answersReceived: currentAnswers.length, averageResponseMs, correctPercent }
   };
 }
