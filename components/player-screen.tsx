@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Loader2, WifiOff, X } from "lucide-react";
+import { Loader2, WifiOff } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { api, useLiveSession } from "@/lib/client";
@@ -37,7 +37,7 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
   }, [code]);
 
   useEffect(() => {
-    setTextAnswer(""):
+    setTextAnswer("");
     setSubmittedQuestion("");
   }, [snapshot?.currentQuestion?.id});
 
@@ -130,7 +130,7 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
    </div>
  ) : (
    <div className="grid gap-3">
-     {question?.options.map((option) => (
+     {question?.options?.map((option) => (
        <Button
          key={option}
          disabled={
@@ -161,9 +161,11 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
             Waiting for the host to reveal the answer...
             </p>
             </motion.div>
-            )}
-        
-
+      )}
+      </div>
+    </PhoneFrame>
+    );
+}     
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-4 py-6">{children}</main>;
 }
@@ -172,6 +174,3 @@ function Waiting({ title, subtitle, offline }: { title: string; subtitle: string
   return <div className="glass w-full rounded-lg p-6 text-center"><h1 className="text-3xl font-black">{title}</h1><p className="mt-3 text-white/65">{subtitle}</p>{offline ? <p className="mt-4 text-yellow-200">Reconnecting...</p> : null}</div>;
 }
 
-function Mini({ label, value }: { label: string; value: React.ReactNode }) {
-  return <div className="rounded-md bg-white/10 p-3"><div className="text-xs text-white/55">{label}</div><div className="font-black">{value}</div></div>;
-}
