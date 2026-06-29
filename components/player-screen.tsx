@@ -119,7 +119,40 @@ setResult({
 
   if (snapshot.session.status === "waiting") return <PhoneFrame><Waiting title="You're in" subtitle="Wait for the quiz to start." offline={offline} /></PhoneFrame>;
   if (snapshot.session.status === "paused") return <PhoneFrame><Waiting title="Paused" subtitle="The host will resume shortly." offline={offline} /></PhoneFrame>;
-  if (snapshot.session.status === "finished") return <PhoneFrame><Waiting title="Finished" subtitle={`Final score: ${snapshot.leaderboard.find((item) => item.id === team.id)?.score || 0} pts. Rank #${rank || "-"}`} offline={offline} /></PhoneFrame>;
+  if (snapshot.session.status === "finished") {
+     const myTeam = snapshot.leaderboard.find(
+       (item) => item.id === team.id
+     );
+     const finalRank =
+       snapshot.leaderboard.findIndex(
+         (item) => item.id === team.id
+       ) + 1;
+     return (
+    <PhoneFrame>
+    <motion.div
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           className="glass w-full rounded-lg p-6 text-center"
+    >
+    <h1 className="text-3xl font-bold">
+             🎉 Quiz Finished
+    </h1>
+    <div className="mt-6">
+<Mini
+           label="Final Score"
+           value={myTeam?.score ?? 0}
+         />
+</div>
+<div className="mt-4">
+<Mini
+           label="Final Rank"
+           value={`#${finalRank}`}
+         />
+</div>
+</motion.div>
+</PhoneFrame>
+ );
+}
 
   const question = snapshot.currentQuestion;
   return (
@@ -185,7 +218,9 @@ setResult({
     <div className="mt-4 grid grid-cols-3 gap-3">
       <Mini label="Points" value={result.points} />
       <Mini label="Total" value={result.total} />
-      <Mini label="Rank" value={`#${result.rank}`} />
+      {snapshot.session.status === "finished" && (
+         <Mini label="Final Rank" value={`#${result.rank}`} />
+         )}
     </div>
   </motion.div>
 
