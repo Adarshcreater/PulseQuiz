@@ -30,6 +30,12 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
   const [submittedQuestion, setSubmittedQuestion] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{
+  correct: boolean;
+  points: number;
+  total: number;
+  rank: number;
+} | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(`team-${code}`);
@@ -39,6 +45,7 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
   useEffect(() => {
     setTextAnswer("");
     setSubmittedQuestion("");
+    setResult(null);
   }, [snapshot?.currentQuestion?.id]);
 
   const answered = submittedQuestion === snapshot?.currentQuestion?.id;
@@ -61,16 +68,30 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
        if (!team || !snapshot?.currentQuestion || answered) return;
        try {
          setSubmittedQuestion(snapshot.currentQuestion.id);
-         await api(
-           `/api/sessions/${code}/answer`,
-           {
-             method: "POST",
-             body: JSON.stringify({
-               teamId: team.id,
-               answer: answerText,
-             }),
-           }
-         );
+         const response = await api<{
+  answer: {
+    is_correct: boolean;
+    points_awarded: number;
+  };
+  team: Team;
+  rank: number;
+}>(
+  `/api/sessions/${code}/answer`,
+  {
+    method: "POST",
+    body: JSON.stringify({
+      teamId: team.id,
+      answer: answerText,
+    }),
+  }
+);
+
+setResult({
+  correct: response.answer.is_correct,
+  points: response.answer.points_awarded,
+  total: response.team.score,
+  rank: response.rank,
+});
          toast.success("Answer submitted");
        } catch (err) {
          setSubmittedQuestion("");
@@ -167,12 +188,12 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
       <Mini label="Rank" value={`#${result.rank}`} />
     </div>
   </motion.div>
-)}
+
       )}
       </div>
     </PhoneFrame>
     );
-}     
+}    
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-4 py-6">{children}</main>;
 }
