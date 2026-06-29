@@ -147,19 +147,20 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
    </div>
  )}
 </div>
-        {answered && (
-            <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-5 glass rounded-lg p-5 text-center"
-            >
-            <Loader2 className="mx-auto h-7 w-7 animate-spin"/>
-            <h3 className="mt-4 text-lg font-bold">
-            Answer Submitted
-            </h3>
-            <p className="mt-2 text-white/60">
-            Waiting for the host to reveal the answer...
-            </p>
+        {answered && result && (
+            <motion.div ...>
+              {result.correct ? (
+              <>
+              Correct
+              </>
+              ) : (
+              <>
+                Incorrect
+              </>
+              )}
+              <Mini label="Points" value={result.points} />
+              <Mini label="Total" value={result.total} />
+              <Mini label="Rank" value={`#${result.rank}`} />
             </motion.div>
       )}
       </div>
