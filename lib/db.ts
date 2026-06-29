@@ -164,7 +164,6 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
       options: q.options,
       correct: q.correct_answer,
     })))
-};
   return {
     session,
     quiz,
@@ -172,12 +171,7 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
     teams,
     answers,
     leaderboard: [...teams].sort((a, b) => b.score - a.score),
-    currentQuestion: currentQuestion
-      ?{
-        ...currentQuestion,
-        correct_answer: "",
-      }
-      :undefined,
+    currentQuestion,
     stats: { answersReceived: currentAnswers.length, averageResponseMs, correctPercent }
   };
 }
