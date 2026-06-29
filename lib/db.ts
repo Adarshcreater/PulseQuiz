@@ -157,6 +157,14 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
   const correctPercent = currentAnswers.length
     ? Math.round((currentAnswers.filter((answer) => answer.is_correct).length / currentAnswers.length) * 100)
     : 0;
+  console.log(
+    questions.map((q) => ({
+      prompt: q.prompt,
+      type: q.type,
+      options: q.options,
+      correct: q.correct_answer,
+    })))
+};
   return {
     session,
     quiz,
