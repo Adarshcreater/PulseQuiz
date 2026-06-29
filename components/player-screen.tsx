@@ -28,13 +28,18 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
   const [name, setName] = useState("");
   const [members, setMembers] = useState(1);
   const [submittedQuestion, setSubmittedQuestion] = useState("");
-  const [result, setResult] = useState<{ correct: boolean; points: number; total: number; rank: number } | null>(null);
+  const [textAnswer, SetTextAnswer] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(`team-${code}`);
     if (saved) setTeam(JSON.parse(saved));
   }, [code]);
+
+  useEffect(() =>{
+    setTextAnswer(""):
+    setSubmittedQuestion("");
+  },[snapshot?.currentQuestion?.id});
 
   const answered = submittedQuestion === snapshot?.currentQuestion?.id;
   const rank = useMemo(() => team && snapshot ? snapshot.leaderboard.findIndex((item) => item.id === team.id) + 1 : 0, [snapshot, team]);
@@ -57,15 +62,27 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
     if (!team || !snapshot?.currentQuestion || answered) return;
     try {
       setSubmittedQuestion(snapshot.currentQuestion.id);
-      const response = await api<{ answer: { is_correct: boolean; points_awarded: number }; team: Team; rank: number }>(`/api/sessions/${code}/answer`, {
-        method: "POST",
-        body: JSON.stringify({ teamId: team.id, answer: option })
-      });
-      setResult({ correct: response.answer.is_correct, points: response.answer.points_awarded, total: response.team.score, rank: response.rank });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Answer failed");
-    }
-  }
+      await api(
+        '/api/sessions/${code}/answer',
+        {
+          method:"POST",
+          body: JSON.stringify({
+            teamID: team.id,
+            answer: answerText
+          })
+        }
+        };
+        toast.success("Answer Submitted");
+  }catch (err) {
+    setSubmittedQuestion("");
+
+    toast.error(
+      err instanceof Error
+      ? err.message
+      :"Answer Failed"
+      );
+}
+
 
   if (!snapshot) return <PhoneFrame><Loader2 className="h-8 w-8 animate-spin" /></PhoneFrame>;
   if (!team) {
@@ -93,29 +110,61 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
       <div className="w-full">
         <p className="text-sm text-white/60">Question {snapshot.session.current_question_index + 1}</p>
         <h1 className="mt-2 text-2xl font-black leading-tight">{question?.prompt}</h1>
-        <div className="mt-5 grid gap-3">
-          {question?.options.map((option) => (
-            <Button key={option} disabled={answered || snapshot.session.status !== "running"} variant="secondary" className="h-auto min-h-14 justify-start whitespace-normal py-4 text-left" onClick={() => answer(option)}>
-              {option}
-            </Button>
-          ))}
-        </div>
-        {answered && result ? (
-          <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-5 glass rounded-lg p-4">
-            <div className={`flex items-center gap-2 text-xl font-black ${result.correct ? "text-emerald-300" : "text-red-300"}`}>
-              {result.correct ? <Check /> : <X />} {result.correct ? "Correct" : "Incorrect"}
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-              <Mini label="Points" value={result.points} />
-              <Mini label="Total" value={result.total} />
-              <Mini label="Rank" value={`#${result.rank}`} />
-            </div>
-          </motion.div>
-        ) : null}
-      </div>
-    </PhoneFrame>
-  );
-}
+        <div className="mt-5">
+            {question?.type === "text" ? (
+              <div className="space-y-3">
+       <Input
+       placeholder="Type your answer..."
+       value={textAnswer}
+       onChange={(e) => setTextAnswer(e.target.value)}
+       disabled={answered}
+     />
+     <Button
+       className="w-full"
+       disabled={
+         answered ||
+         !textAnswer.trim() ||
+         snapshot.session.status !== "running"
+       }
+       onClick={() => answer(textAnswer)}
+     >
+       Submit
+     </Button>
+   </div>
+ ) : (
+   <div className="grid gap-3">
+     {question?.options.map((option) => (
+       <Button
+         key={option}
+         disabled={
+           answered ||
+           snapshot.session.status !== "running"
+         }
+         variant="secondary"
+         className="h-auto min-h-14 justify-start whitespace-normal py-4 text-left"
+         onClick={() => answer(option)}
+       >
+         {option}
+       </Button>
+     ))}
+   </div>
+ )}
+</div>
+        {answered && (
+<motion.div
+initial={{ opacity: 0 }}
+animate={{ opacity: 1 }}
+className="mt-5 glass rounded-lg p-5 text-center"
+>
+<Loader2 className="mx-auto h-7 w-7 animate-spin"/>
+<h3 className="mt-4 text-lg font-bold">
+Answer Submitted
+</h3>
+<p className="mt-2 text-white/60">
+Waiting for the host to reveal the answer...
+</p>
+</motion.div>
+)}
 
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-4 py-6">{children}</main>;
