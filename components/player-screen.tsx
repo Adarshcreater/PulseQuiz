@@ -28,7 +28,7 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
   const [name, setName] = useState("");
   const [members, setMembers] = useState(1);
   const [submittedQuestion, setSubmittedQuestion] = useState("");
-  const [textAnswer, SetTextAnswer] = useState("");
+  const [textAnswer, setTextAnswer] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -36,10 +36,10 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
     if (saved) setTeam(JSON.parse(saved));
   }, [code]);
 
-  useEffect(() =>{
+  useEffect(() => {
     setTextAnswer(""):
     setSubmittedQuestion("");
-  },[snapshot?.currentQuestion?.id});
+  }, [snapshot?.currentQuestion?.id});
 
   const answered = submittedQuestion === snapshot?.currentQuestion?.id;
   const rank = useMemo(() => team && snapshot ? snapshot.leaderboard.findIndex((item) => item.id === team.id) + 1 : 0, [snapshot, team]);
@@ -57,33 +57,30 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
       setLoading(false);
     }
   }
-
-  async function answer(option: string) {
-    if (!team || !snapshot?.currentQuestion || answered) return;
-    try {
-      setSubmittedQuestion(snapshot.currentQuestion.id);
-      await api(
-        '/api/sessions/${code}/answer',
-        {
-          method:"POST",
-          body: JSON.stringify({
-            teamID: team.id,
-            answer: answerText
-          })
-        }
-        };
-        toast.success("Answer Submitted");
-  }catch (err) {
-    setSubmittedQuestion("");
-
-    toast.error(
-      err instanceof Error
-      ? err.message
-      :"Answer Failed"
-      );
-}
-
-
+  async function answer(answerText: string) {
+       if (!team || !snapshot?.currentQuestion || answered) return;
+       try {
+         setSubmittedQuestion(snapshot.currentQuestion.id);
+         await api(
+           `/api/sessions/${code}/answer`,
+           {
+             method: "POST",
+             body: JSON.stringify({
+               teamId: team.id,
+               answer: answerText,
+             }),
+           }
+         );
+         toast.success("Answer submitted");
+       } catch (err) {
+         setSubmittedQuestion("");
+         toast.error(
+           err instanceof Error
+             ? err.message
+             : "Answer failed"
+         );
+       }
+      }
   if (!snapshot) return <PhoneFrame><Loader2 className="h-8 w-8 animate-spin" /></PhoneFrame>;
   if (!team) {
     return (
@@ -151,20 +148,21 @@ export function PlayerScreen({ code, initial }: { code: string; initial: Session
  )}
 </div>
         {answered && (
-<motion.div
-initial={{ opacity: 0 }}
-animate={{ opacity: 1 }}
-className="mt-5 glass rounded-lg p-5 text-center"
->
-<Loader2 className="mx-auto h-7 w-7 animate-spin"/>
-<h3 className="mt-4 text-lg font-bold">
-Answer Submitted
-</h3>
-<p className="mt-2 text-white/60">
-Waiting for the host to reveal the answer...
-</p>
-</motion.div>
-)}
+            <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-5 glass rounded-lg p-5 text-center"
+            >
+            <Loader2 className="mx-auto h-7 w-7 animate-spin"/>
+            <h3 className="mt-4 text-lg font-bold">
+            Answer Submitted
+            </h3>
+            <p className="mt-2 text-white/60">
+            Waiting for the host to reveal the answer...
+            </p>
+            </motion.div>
+            )}
+        
 
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-4 py-6">{children}</main>;
