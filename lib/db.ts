@@ -164,12 +164,7 @@ export async function getSnapshot(code: string): Promise<SessionSnapshot | null>
     teams,
     answers,
     leaderboard: [...teams].sort((a, b) => b.score - a.score),
-    currentQuestion: currentQuestion
-    ?{
-      ...currentQuestion,
-      correct_answer:"",
-    }
-      : undefined,
+    currentQuestion,
     stats: { answersReceived: currentAnswers.length, averageResponseMs, correctPercent }
   };
 }
@@ -229,6 +224,7 @@ export async function submitAnswer(code: string, teamId: string, answer: string)
   const snapshot = await getSnapshot(code);
   if (!snapshot?.currentQuestion) throw new Error("Question not active");
   if (snapshot.session.status !== "running") throw new Error("Question is not accepting answers");
+  if (!answer.trim()){ throw new Error("Answer cannot be empyu");}
   const question = snapshot.currentQuestion;
   const startedAt = snapshot.session.question_started_at ? new Date(snapshot.session.question_started_at).getTime() : Date.now();
   const responseMs = Math.max(0, Date.now() - startedAt);
@@ -244,7 +240,7 @@ export async function submitAnswer(code: string, teamId: string, answer: string)
   if (!saved) throw new Error("Answer already submitted");
   await sql`UPDATE teams SET score=score + ${points} WHERE id=${teamId}`;
   const fresh = await getSnapshot(code);
-  const team = fresh?.leaderboard.find((item) => item.id === teamId);
+  const team = fresh?.teams.find((item) => item.id === teamId);
   const rank = fresh ? fresh.leaderboard.findIndex((item) => item.id === teamId) + 1 : 0;
   return { answer: saved, team, rank };
 }
